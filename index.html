@@ -1,0 +1,468 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>歯科用語 暗記カード</title>
+  <style>
+    :root {
+      --bg: #f6f7fb;
+      --card: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --line: #dbe1ea;
+      --accent: #2563eb;
+      --accent-soft: #eff6ff;
+      --good: #166534;
+      --bad: #991b1b;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Hiragino Sans", "Yu Gothic", sans-serif;
+    }
+    .wrap {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 16px 14px 40px;
+    }
+    .panel {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 14px;
+      box-shadow: 0 4px 18px rgba(0,0,0,0.04);
+    }
+    h1 {
+      margin: 0 0 8px;
+      font-size: 24px;
+    }
+    .sub {
+      color: var(--muted);
+      font-size: 14px;
+      margin-bottom: 14px;
+      line-height: 1.6;
+    }
+    .controls {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    .btn, select {
+      width: 100%;
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--text);
+      border-radius: 12px;
+      min-height: 46px;
+      padding: 10px 12px;
+      font-size: 16px;
+    }
+    .btn.primary {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+      font-weight: 700;
+    }
+    .btn.soft {
+      background: var(--accent-soft);
+      border-color: #bfdbfe;
+      color: #1d4ed8;
+      font-weight: 700;
+    }
+    .btn:active {
+      transform: translateY(1px);
+    }
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    .stat {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 10px 12px;
+      text-align: center;
+    }
+    .stat .label {
+      display: block;
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+    .stat .value {
+      font-size: 18px;
+      font-weight: 700;
+    }
+    .flashcard {
+      margin-top: 10px;
+      border: 1px solid var(--line);
+      background: linear-gradient(180deg, #fff 0%, #fcfdff 100%);
+      border-radius: 20px;
+      padding: 20px 16px;
+      min-height: 320px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: stretch;
+      text-align: center;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: manipulation;
+    }
+    .mode {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+    .q {
+      font-size: 34px;
+      font-weight: 800;
+      line-height: 1.35;
+      word-break: break-word;
+      margin-bottom: 18px;
+    }
+    .a {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--accent);
+      line-height: 1.4;
+      word-break: break-word;
+      min-height: 48px;
+      opacity: 0;
+      transition: opacity .18s ease;
+    }
+    .a.show {
+      opacity: 1;
+    }
+    .hint {
+      margin-top: 12px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 14px;
+    }
+    .bottom {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 10px;
+      margin-top: 12px;
+    }
+    .good {
+      background: #ecfdf5;
+      border-color: #bbf7d0;
+      color: var(--good);
+      font-weight: 700;
+    }
+    .bad {
+      background: #fef2f2;
+      border-color: #fecaca;
+      color: var(--bad);
+      font-weight: 700;
+    }
+    .note {
+      margin-top: 14px;
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+    .empty {
+      text-align: center;
+      padding: 24px 10px;
+      color: var(--muted);
+    }
+    @media (max-width: 560px) {
+      h1 { font-size: 22px; }
+      .q { font-size: 30px; }
+      .a { font-size: 24px; }
+      .row, .bottom, .controls, .actions { grid-template-columns: 1fr; }
+      .flashcard { min-height: 280px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="panel">
+      <h1>歯科用語 暗記カード</h1>
+      <div class="sub">
+        iPhoneのSafariでそのまま使えるようにした版です。<br>
+        「問題を見る」→「答えを見る」→「できた / まだ」で進めます。
+      </div>
+
+      <div class="controls">
+        <select id="modeSelect" aria-label="出題モード">
+          <option value="kanji-to-yomi">漢字 → 読み仮名</option>
+          <option value="yomi-to-kanji">読み仮名 → 漢字</option>
+        </select>
+        <button class="btn soft" id="shuffleBtn" type="button">シャッフル</button>
+      </div>
+
+      <div class="row">
+        <div class="stat"><span class="label">全カード</span><span class="value" id="totalCount">0</span></div>
+        <div class="stat"><span class="label">いまの番号</span><span class="value" id="currentPos">0</span></div>
+        <div class="stat"><span class="label">苦手カード</span><span class="value" id="wrongCount">0</span></div>
+      </div>
+
+      <div class="flashcard" id="card" role="button" tabindex="0" aria-label="暗記カード">
+        <div class="mode" id="modeLabel"></div>
+        <div class="q" id="question">読み込み中…</div>
+        <div class="a" id="answer"></div>
+        <div class="hint" id="hint">下のボタンで答えを表示できます</div>
+      </div>
+
+      <div class="actions">
+        <button class="btn primary" id="showBtn" type="button">答えを見る</button>
+        <button class="btn" id="nextBtn" type="button">次へ</button>
+      </div>
+
+      <div class="bottom">
+        <button class="btn good" id="knownBtn" type="button">できた</button>
+        <button class="btn bad" id="unknownBtn" type="button">まだ</button>
+        <button class="btn" id="retryBtn" type="button">苦手だけ復習</button>
+      </div>
+
+      <div class="note">
+        公開サイトとして置けば、iPhoneでも動きます。<br>
+        いま入っている単語は、送ってもらった画像の内容をもとに登録済みです。
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const defaultData = [
+      ["挨拶","あいさつ"],
+      ["臨床","りんしょう"],
+      ["処置","しょち"],
+      ["既往歴","きおうれき"],
+      ["主訴","しゅそ"],
+      ["洗口","せんこう"],
+      ["手指","しゅし"],
+      ["印象","いんしょう"],
+      ["偶発事故","ぐうはつじこ"],
+      ["口腔","こうくう"],
+      ["永久歯","えいきゅうし"],
+      ["乳歯","にゅうし"],
+      ["前歯","ぜんし"],
+      ["臼歯","きゅうし"],
+      ["切歯","せっし"],
+      ["智歯","ちし"],
+      ["小窩","しょうか"],
+      ["裂溝","れっこう"],
+      ["象牙質","ぞうげしつ"],
+      ["歯髄","しずい"],
+      ["歯槽骨","しそうこつ"],
+      ["口唇","こうしん"],
+      ["歯肉","しにく"],
+      ["歯間乳頭","しかんにゅうとう"],
+      ["唇側","しんそく"],
+      ["舌側","ぜっそく"],
+      ["頬側","きょうそく"],
+      ["口蓋側","こうがいそく"],
+      ["歯頸部","しけいぶ"],
+      ["近心","きんしん"],
+      ["遠心","えんしん"],
+      ["正中線","せいちゅうせん"],
+      ["上顎","じょうがく"],
+      ["下顎","かがく"],
+      ["萌出","ほうしゅつ"],
+      ["叢生","そうせい"],
+      ["細菌","さいきん"],
+      ["歯垢","しこう"],
+      ["歯石","しせき"],
+      ["脱灰","だっかい"],
+      ["炎症","えんしょう"],
+      ["咀嚼","そしゃく"],
+      ["嚥下","えんげ"],
+      ["抑制","よくせい"],
+      ["禁忌","きんき"],
+      ["疼痛","とうつう"],
+      ["把持","はじ"],
+      ["除去","じょきょ"],
+      ["保持","ほじ"],
+      ["彎曲","わんきょく"],
+      ["頻度","ひんど"],
+      ["好発","こうはつ"],
+      ["空隙","くうげき"],
+      ["喪失","そうしつ"],
+      ["挙上","きょじょう"],
+      ["用途","ようと"],
+      ["填塞","てんそく"],
+      ["合着","ごうちゃく"],
+      ["裏層","りそう"],
+      ["併用","へいよう"],
+      ["歯列","しれつ"],
+      ["粘膜","ねんまく"],
+      ["歯周","ししゅう"],
+      ["歯牙","しが"],
+      ["患者","かんじゃ"],
+      ["治療","ちりょう"],
+      ["診察","しんさつ"],
+      ["問診","もんしん"],
+      ["正中","せいちゅう"]
+    ];
+
+    let deck = [...defaultData];
+    let wrongDeck = [];
+    let currentIndex = 0;
+    let revealed = false;
+    let mode = "kanji-to-yomi";
+
+    const els = {
+      modeSelect: document.getElementById("modeSelect"),
+      shuffleBtn: document.getElementById("shuffleBtn"),
+      totalCount: document.getElementById("totalCount"),
+      currentPos: document.getElementById("currentPos"),
+      wrongCount: document.getElementById("wrongCount"),
+      modeLabel: document.getElementById("modeLabel"),
+      question: document.getElementById("question"),
+      answer: document.getElementById("answer"),
+      hint: document.getElementById("hint"),
+      showBtn: document.getElementById("showBtn"),
+      nextBtn: document.getElementById("nextBtn"),
+      knownBtn: document.getElementById("knownBtn"),
+      unknownBtn: document.getElementById("unknownBtn"),
+      retryBtn: document.getElementById("retryBtn"),
+      card: document.getElementById("card")
+    };
+
+    function shuffle(arr) {
+      const a = [...arr];
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+
+    function currentCard() {
+      return deck[currentIndex] || null;
+    }
+
+    function getQandA(card) {
+      if (!card) return ["", ""];
+      const [kanji, yomi] = card;
+      return mode === "kanji-to-yomi" ? [kanji, yomi] : [yomi, kanji];
+    }
+
+    function updateStats() {
+      els.totalCount.textContent = String(deck.length);
+      els.currentPos.textContent = deck.length ? String(currentIndex + 1) : "0";
+      els.wrongCount.textContent = String(wrongDeck.length);
+    }
+
+    function render() {
+      updateStats();
+
+      if (!deck.length) {
+        els.modeLabel.textContent = "カードがありません";
+        els.question.textContent = "復習するカードがありません";
+        els.answer.textContent = "";
+        els.answer.classList.remove("show");
+        els.hint.textContent = "シャッフルか通常学習に戻してください";
+        return;
+      }
+
+      const card = currentCard();
+      const [q, a] = getQandA(card);
+      els.modeLabel.textContent = mode === "kanji-to-yomi" ? "漢字 → 読み仮名" : "読み仮名 → 漢字";
+      els.question.textContent = q;
+      els.answer.textContent = a;
+      els.answer.classList.toggle("show", revealed);
+      els.hint.textContent = revealed ? "できた / まだ を押して進めます" : "「答えを見る」を押してください";
+    }
+
+    function revealAnswer() {
+      revealed = true;
+      render();
+    }
+
+    function nextCard() {
+      if (!deck.length) return;
+      revealed = false;
+      currentIndex = (currentIndex + 1) % deck.length;
+      render();
+    }
+
+    function markKnown() {
+      if (!deck.length) return;
+      const key = JSON.stringify(currentCard());
+      wrongDeck = wrongDeck.filter(item => JSON.stringify(item) !== key);
+      nextCard();
+    }
+
+    function markUnknown() {
+      if (!deck.length) return;
+      const item = currentCard();
+      const key = JSON.stringify(item);
+      if (!wrongDeck.some(x => JSON.stringify(x) === key)) {
+        wrongDeck.push(item);
+      }
+      nextCard();
+    }
+
+    function retryWrong() {
+      if (!wrongDeck.length) {
+        alert("まだ苦手カードはありません。");
+        return;
+      }
+      deck = [...wrongDeck];
+      currentIndex = 0;
+      revealed = false;
+      render();
+    }
+
+    function resetNormalDeck() {
+      deck = [...defaultData];
+      currentIndex = 0;
+      revealed = false;
+      render();
+    }
+
+    els.modeSelect.addEventListener("change", (e) => {
+      mode = e.target.value;
+      revealed = false;
+      render();
+    });
+
+    els.shuffleBtn.addEventListener("click", () => {
+      deck = shuffle(deck.length ? deck : defaultData);
+      currentIndex = 0;
+      revealed = false;
+      render();
+    });
+
+    els.showBtn.addEventListener("click", revealAnswer);
+    els.nextBtn.addEventListener("click", nextCard);
+    els.knownBtn.addEventListener("click", markKnown);
+    els.unknownBtn.addEventListener("click", markUnknown);
+    els.retryBtn.addEventListener("click", retryWrong);
+
+    els.card.addEventListener("click", () => {
+      if (!revealed) revealAnswer();
+      else nextCard();
+    });
+
+    els.card.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        if (!revealed) revealAnswer();
+        else nextCard();
+      }
+    });
+
+    render();
+
+    // Expose for simple debugging in browser console if needed
+    window.flashcardsApp = { resetNormalDeck, retryWrong, defaultData };
+  </script>
+</body>
+</html>
